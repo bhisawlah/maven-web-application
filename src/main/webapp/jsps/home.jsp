@@ -14,7 +14,8 @@
 	           We are raising billionaires IT professionals accross the nations of the World.
 	We offer Training for DevOps with Linux, Kubernetes and Cloud, equipping IT Engineers for best performance.
         Landmark Technologies, the Pride of Africa.
-	Class35 DevOps MasterClass started on January 6, 2024. </h1>
+	Class35 DevOps MasterClass started on January 6, 2024.
+Year 2024 is my year In Jesus Name</h1>
 <hr>
 <br>
 	<h1><h3> Server Side IP Address </h3><br>
