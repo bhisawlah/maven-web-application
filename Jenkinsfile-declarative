@@ -1,0 +1,95 @@
+pipeline{
+   agent any  
+   //options{}
+   //triggers{}
+   tools {
+      maven 'maven3.9.6'
+   }
+   stages{
+    stage('1.CloneCode'){
+      steps{
+         sh  "echo cloning the latest app version"
+         git 'https://github.com/bhisawlah/maven-web-application'
+      }
+    }
+    stage('2.mvnBuild'){
+      steps{
+       sh "echo validate, compile and perform UnitTesting"
+       sh "echo UnitTesting must passed for artifacts to be created"
+       sh "mvn clean package"
+      }
+
+    }
+    
+    stage('3.CodeQuality'){
+      steps{
+         sh "mvn sonar:sonar"
+         sh "echo CodeQualityAnalysis completed"          
+      }
+
+    }
+    
+    stage('4.UploadArtifacts'){
+      steps{
+          sh "mvn deploy" 
+          sh "echo artifacts uploaded successfully"
+          sh "echo I am now a Build and Release Engineer"
+          sh "echo Build and release completed"         
+      }
+    }
+    stage('5.Deploy2UAT'){
+      steps{
+        sh "echo Deployment is ready for the client review"
+        sh "echo using deploy to container plugin" 
+        deploy adapters: [tomcat9(credentialsId: 'tomcat-credential', path: '', url: 'http://52.91.68.142:8080/')], contextPath: null, war: 'target/*war'
+
+      }
+    }
+   
+    stage('6.ManualApproval'){
+      steps{
+       sh "echo Please Review and confirm within 5 days"
+       timeout(time:5, unit:'DAYS'){
+       input message: 'Application ready for deployment, Please review and approve'     
+       }
+ 
+      }
+    }
+     stage('7.Deploy2Prod'){
+      steps{
+        sh "echo application reviewed, approved and ready for the market" 
+        deploy adapters: [tomcat9(credentialsId: 'tomcat-credential', path: '', url: 'http://52.91.68.142:8080/')], contextPath: null, war: 'target/*war'
+
+      }
+    }
+   }
+    post{
+      always{
+            emailext body: '''Hi,
+
+Build status.
+
+Regards,
+
+Ajisegbede Abisola''', recipientProviders: [developers(), contributor(), requestor()], subject: 'Build update', to: 'ajisegbedeabisolat@gmail.com'
+        }
+        success{
+            emailext body: '''Hi,
+
+Build completed.
+
+Regards,
+
+Ajisegbede Abisola''', recipientProviders: [developers(), contributor(), requestor()], subject: 'Build update', to: 'ajisegbedeabisolat@gmail.com'
+        }
+        failure{
+            emailext body: '''Hi,
+
+Build Failed.
+
+Regards,
+
+Ajisegbede Abisola''', recipientProviders: [developers(), contributor(), requestor()], subject: 'Build update', to: 'ajisegbedeabisolat@gmail.com'
+        }
+    }
+   }
